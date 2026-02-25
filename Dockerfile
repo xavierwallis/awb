@@ -6,7 +6,7 @@ copy . .
 run cargo build --release
 
 
-from debian:dixie-slim
+from debian:trixie-slim
 workdir /app
 
 # (optional but common) TLS certs for HTTP clients
