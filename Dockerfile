@@ -1,4 +1,4 @@
-from rust:latest as builder
+from rust:1-bookworm as builder
 
 workdir /app
 copy . .
@@ -6,11 +6,25 @@ copy . .
 run cargo build --release
 
 
-from debian:trixie-slim
+from debian:bookworm-slim
 workdir /app
 
-# (optional but common) TLS certs for HTTP clients
-run apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+run apt-get update && apt-get install -y \
+  ca-certificates \
+  chromium \
+  fonts-liberation \
+  libnss3 \
+  libatk-bridge2.0-0 \
+  libgtk-3-0 \
+  libx11-xcb1 \
+  libxcomposite1 \
+  libxrandr2 \
+  libxdamage1 \
+  libgbm1 \
+  libasound2 \
+  libxshmfence1 \
+  libdrm2 \
+  && rm -rf /var/lib/apt/lists/*
 
 copy --from=builder /app/target/release/awb /usr/local/bin/awb
 

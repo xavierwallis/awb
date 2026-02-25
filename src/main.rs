@@ -1,13 +1,10 @@
 #[macro_use]
 extern crate rocket;
-use headless_chrome::Element;
 use rocket::http::{ContentType, Status};
 use rocket::serde::{Deserialize, Serialize, json::Json};
 
 pub mod browser_singleton;
 use crate::browser_singleton::BrowserSingleton;
-
-const OKAY: &str = "Okay";
 
 #[get("/health-check")]
 async fn index() -> String {
@@ -44,22 +41,22 @@ struct GotoRequest {
 async fn goto(request: Json<GotoRequest>) -> Json<ApiResponse<String>> {
     match BrowserSingleton::goto(&request.url) {
         Ok(_) => match BrowserSingleton::get_content() {
-            Ok( html ) => Json( ApiResponse {
+            Ok(html) => Json(ApiResponse {
                 success: true,
-                data: Some( html ),
-                error: None
-            } ),
-            Err( error ) => Json( ApiResponse {
+                data: Some(html),
+                error: None,
+            }),
+            Err(error) => Json(ApiResponse {
                 success: false,
                 data: None,
-                error: Some( error.to_string() )
-            } )
+                error: Some(error.to_string()),
+            }),
         },
-        Err(error) => Json( ApiResponse {
+        Err(error) => Json(ApiResponse {
             success: false,
             data: None,
-            error: Some( error.to_string() )
-        } ),
+            error: Some(error.to_string()),
+        }),
     }
 }
 
@@ -68,16 +65,16 @@ async fn goto(request: Json<GotoRequest>) -> Json<ApiResponse<String>> {
 #[get("/get/content")]
 async fn get_content() -> Json<ApiResponse<String>> {
     match BrowserSingleton::get_content() {
-        Ok( html ) => Json( ApiResponse {
+        Ok(html) => Json(ApiResponse {
             success: true,
-            data: Some( html ),
-            error: None
+            data: Some(html),
+            error: None,
         }),
-        Err( error ) => Json( ApiResponse {
+        Err(error) => Json(ApiResponse {
             success: false,
             data: None,
-            error: Some( error.to_string() )
-        })
+            error: Some(error.to_string()),
+        }),
     }
 }
 
@@ -92,8 +89,16 @@ struct ClickRequest {
 #[post("/click", data = "<request>", format = "application/json")]
 async fn click(request: Json<ClickRequest>) -> Json<ApiResponse<String>> {
     match BrowserSingleton::click(&request.selector) {
-        Ok(()) => Json( ApiResponse { success: true, data: None, error: None } ), 
-        Err( error ) => Json( ApiResponse { success: false, data: None, error: Some( error.to_string() ) }),
+        Ok(()) => Json(ApiResponse {
+            success: true,
+            data: None,
+            error: None,
+        }),
+        Err(error) => Json(ApiResponse {
+            success: false,
+            data: None,
+            error: Some(error.to_string()),
+        }),
     }
 }
 
@@ -109,8 +114,16 @@ struct KeysRequest {
 #[post("/send/keys", data = "<request>", format = "application/json")]
 async fn send_keys(request: Json<KeysRequest>) -> Json<ApiResponse<String>> {
     match BrowserSingleton::send_keys(&request.selector, &request.keys) {
-        Ok(()) => Json( ApiResponse { success: true, data: None, error: None } ), 
-        Err( error ) => Json( ApiResponse { success: false, data: None, error: Some( error.to_string() ) }),
+        Ok(()) => Json(ApiResponse {
+            success: true,
+            data: None,
+            error: None,
+        }),
+        Err(error) => Json(ApiResponse {
+            success: false,
+            data: None,
+            error: Some(error.to_string()),
+        }),
     }
 }
 
@@ -120,16 +133,24 @@ async fn send_keys(request: Json<KeysRequest>) -> Json<ApiResponse<String>> {
 async fn screenshot() -> Result<(ContentType, Vec<u8>), Status> {
     BrowserSingleton::screenshot()
         .map(|bytes| (ContentType::PNG, bytes))
-        .map_err(|_| Status::InternalServerError)    
+        .map_err(|_| Status::InternalServerError)
 }
 
 // GET ELEMENT CONTENT
 
 #[get("/get/content/<selector>")]
 async fn get_element_content(selector: &str) -> Json<ApiResponse<String>> {
-    match BrowserSingleton::get_element_content( selector ) {
-        Ok( content ) => Json( ApiResponse { success: true, data: Some( content ), error: None } ), 
-        Err( error ) => Json( ApiResponse { success: false, data: None, error: Some( error.to_string() ) }),
+    match BrowserSingleton::get_element_content(selector) {
+        Ok(content) => Json(ApiResponse {
+            success: true,
+            data: Some(content),
+            error: None,
+        }),
+        Err(error) => Json(ApiResponse {
+            success: false,
+            data: None,
+            error: Some(error.to_string()),
+        }),
     }
 }
 
@@ -138,14 +159,21 @@ async fn get_element_content(selector: &str) -> Json<ApiResponse<String>> {
 #[get("/wait/for/<selector>")]
 async fn wait_for_element(selector: &str) -> Json<ApiResponse<String>> {
     match BrowserSingleton::wait_for(selector) {
-        Ok( element ) => Json( ApiResponse { success: true, data: Some( String::from( "Present" ) ), error: None } ), 
-        Err( error ) => Json( ApiResponse { success: false, data: None, error: Some( error.to_string() ) }),
+        Ok(element) => Json(ApiResponse {
+            success: true,
+            data: Some(String::from("Present")),
+            error: None,
+        }),
+        Err(error) => Json(ApiResponse {
+            success: false,
+            data: None,
+            error: Some(error.to_string()),
+        }),
     }
 }
 
 #[launch]
 fn rocket() -> _ {
-    let _ = BrowserSingleton::browser();
     rocket::build().mount(
         "/",
         routes![

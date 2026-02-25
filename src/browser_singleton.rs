@@ -1,7 +1,6 @@
-use std::sync::{Arc, OnceLock};
-
 use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
 use headless_chrome::{Browser, LaunchOptionsBuilder, Tab};
+use std::sync::{Arc, OnceLock};
 
 pub struct BrowserSingleton {
     browser: Browser,
@@ -41,16 +40,20 @@ impl BrowserSingleton {
     }
 
     pub fn get_element_content(selector: &str) -> Result<String, anyhow::Error> {
-        BrowserSingleton::tab().find_element(selector)?.get_content()
+        BrowserSingleton::tab()
+            .find_element(selector)?
+            .get_content()
     }
 
     pub fn goto(url: &str) -> Result<(), anyhow::Error> {
-        BrowserSingleton::tab().navigate_to(url)?; 
+        BrowserSingleton::tab().navigate_to(url)?;
         Ok(())
     }
 
     pub fn click(selector: &str) -> Result<(), anyhow::Error> {
-        BrowserSingleton::tab().wait_for_element(selector)?.click()?;
+        BrowserSingleton::tab()
+            .wait_for_element(selector)?
+            .click()?;
         Ok(())
     }
 
@@ -65,6 +68,11 @@ impl BrowserSingleton {
     }
 
     pub fn screenshot() -> Result<Vec<u8>, anyhow::Error> {
-        BrowserSingleton::tab().capture_screenshot(CaptureScreenshotFormatOption::Png, None, None, true )
+        BrowserSingleton::tab().capture_screenshot(
+            CaptureScreenshotFormatOption::Png,
+            None,
+            None,
+            true,
+        )
     }
 }
