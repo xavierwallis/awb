@@ -1,5 +1,7 @@
 use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
 use headless_chrome::{Browser, LaunchOptionsBuilder, Tab};
+use std::ffi::OsStr;
+use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 
 pub struct BrowserSingleton {
@@ -21,9 +23,11 @@ impl BrowserSingleton {
     pub fn initialize() -> BrowserSingleton {
         let browser = Browser::new(
             LaunchOptionsBuilder::default()
+                //.path(Some(PathBuf::from("/usr/bin/chromium")))
                 .headless(true)
                 .window_size(Some((1280, 800)))
                 .port(Some(9222))
+                //.extensions(vec![OsStr::new("/app/selenium-extensions/Vimium")])
                 .sandbox(false)
                 .build()
                 .unwrap(),
@@ -61,8 +65,7 @@ impl BrowserSingleton {
         BrowserSingleton::tab().wait_for_element(selector)
     }
 
-    pub fn send_keys(selector: &str, keys: &str) -> Result<(), anyhow::Error> {
-        BrowserSingleton::click(selector)?;
+    pub fn send_keys(keys: &str) -> Result<(), anyhow::Error> {
         BrowserSingleton::tab().send_character(keys)?;
         Ok(())
     }

@@ -3,8 +3,8 @@ extern crate rocket;
 use rocket::http::{ContentType, Status};
 use rocket::serde::{Deserialize, Serialize, json::Json};
 
-pub mod browser_singleton;
-use crate::browser_singleton::BrowserSingleton;
+pub mod awb;
+use crate::awb::BrowserSingleton;
 
 #[get("/health-check")]
 async fn index() -> String {
@@ -40,18 +40,11 @@ struct GotoRequest {
 #[post("/goto", format = "application/json", data = "<request>")]
 async fn goto(request: Json<GotoRequest>) -> Json<ApiResponse<String>> {
     match BrowserSingleton::goto(&request.url) {
-        Ok(_) => match BrowserSingleton::get_content() {
-            Ok(html) => Json(ApiResponse {
-                success: true,
-                data: Some(html),
-                error: None,
-            }),
-            Err(error) => Json(ApiResponse {
-                success: false,
-                data: None,
-                error: Some(error.to_string()),
-            }),
-        },
+        Ok(_) => Json(ApiResponse {
+            success: true,
+            data: None,
+            error: None,
+        }),
         Err(error) => Json(ApiResponse {
             success: false,
             data: None,
@@ -107,13 +100,12 @@ async fn click(request: Json<ClickRequest>) -> Json<ApiResponse<String>> {
 #[derive(Deserialize)]
 #[serde(crate = "rocket::serde")]
 struct KeysRequest {
-    selector: String,
     keys: String,
 }
 
 #[post("/send/keys", data = "<request>", format = "application/json")]
 async fn send_keys(request: Json<KeysRequest>) -> Json<ApiResponse<String>> {
-    match BrowserSingleton::send_keys(&request.selector, &request.keys) {
+    match BrowserSingleton::send_keys(&request.keys) {
         Ok(()) => Json(ApiResponse {
             success: true,
             data: None,
@@ -174,6 +166,7 @@ async fn wait_for_element(selector: &str) -> Json<ApiResponse<String>> {
 
 #[launch]
 fn rocket() -> _ {
+    let _ = BrowserSingleton::browser();
     rocket::build().mount(
         "/",
         routes![
