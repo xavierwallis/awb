@@ -41,24 +41,16 @@ impl BrowserSingleton {
     }
 
     pub fn get_element_content(selector: &str) -> Result<String, anyhow::Error> {
-        BrowserSingleton::tab()
-            .find_element(selector)
-            .expect("Couldnt Find Element")
-            .get_content()
+        BrowserSingleton::tab().find_element(selector)?.get_content()
     }
 
     pub fn goto(url: &str) -> Result<(), anyhow::Error> {
-        BrowserSingleton::tab()
-            .navigate_to(url)
-            .expect("Cannot Go To Specified URL");
+        BrowserSingleton::tab().navigate_to(url)?; 
         Ok(())
     }
 
     pub fn click(selector: &str) -> Result<(), anyhow::Error> {
-        BrowserSingleton::tab()
-            .wait_for_element(selector)?
-            .click()
-            .expect("Cannot Click Element");
+        BrowserSingleton::tab().wait_for_element(selector)?.click()?;
         Ok(())
     }
 
@@ -67,16 +59,12 @@ impl BrowserSingleton {
     }
 
     pub fn send_keys(selector: &str, keys: &str) -> Result<(), anyhow::Error> {
-        BrowserSingleton::click(selector).expect("Cannot Click");
-        BrowserSingleton::tab()
-            .send_character(keys)
-            .expect("Cannot Type Text");
+        BrowserSingleton::click(selector)?;
+        BrowserSingleton::tab().send_character(keys)?;
         Ok(())
     }
 
-    pub fn screenshot() -> Vec<u8> {
-        BrowserSingleton::tab()
-            .capture_screenshot(CaptureScreenshotFormatOption::Png, None, None, true)
-            .expect("Cannot Screenshot")
+    pub fn screenshot() -> Result<Vec<u8>, anyhow::Error> {
+        BrowserSingleton::tab().capture_screenshot(CaptureScreenshotFormatOption::Png, None, None, true )
     }
 }
