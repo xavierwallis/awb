@@ -106,7 +106,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "awb-controller"
+name = "awb"
 version = "0.1.4"
 dependencies = [
  "anyhow",
