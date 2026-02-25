@@ -1,0 +1,77 @@
+use std::sync::{
+    Arc, OnceLock 
+};
+
+use headless_chrome::{Browser, LaunchOptionsBuilder, Tab};
+use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
+
+pub struct BrowserSingleton {
+    browser: Browser,
+    tab: Arc<Tab>
+}
+
+
+pub static SINGLETON: OnceLock<BrowserSingleton> = OnceLock::new();
+
+impl BrowserSingleton {
+    pub fn browser() -> &'static Browser {
+        &SINGLETON.get_or_init( BrowserSingleton::initialize ).browser
+    }
+
+    pub fn tab() -> &'static Arc<Tab> {
+        &SINGLETON.get_or_init( BrowserSingleton::initialize ).tab
+    }
+
+    pub fn initialize() -> BrowserSingleton {
+        let browser = Browser::new(
+                LaunchOptionsBuilder::default()
+                    .headless(true)
+                    .window_size(Some((1280, 800)))
+                    .build()
+                    .unwrap(),
+            )
+            .expect( "Could Not Start Browser" );
+
+        let tab = browser.new_tab().expect("Could Not Open Tab");
+
+        BrowserSingleton {
+            browser,
+            tab
+        }
+
+    }
+
+    pub fn get_content() -> Result<String, anyhow::Error> {
+        BrowserSingleton::tab().get_content()
+    }
+
+    pub fn get_element_content( selector: &str ) -> Result<String, anyhow::Error> {
+        BrowserSingleton::tab().find_element( selector ).expect( "Couldnt Find Element" ).get_content()
+    }
+
+
+    pub fn goto( url: &str ) -> Result<(), anyhow::Error> {
+        BrowserSingleton::tab().navigate_to( url );
+        Ok(())
+    }
+
+    pub fn click( selector: &str ) -> Result<(), anyhow::Error> {
+        BrowserSingleton::tab().wait_for_element( selector )?.click();
+        Ok(())
+    }
+
+    pub fn wait_for( selector: &str ) -> Result<headless_chrome::Element<'_>, anyhow::Error> {
+        BrowserSingleton::tab().wait_for_element( selector )
+    }
+
+    pub fn send_keys( selector: &str, keys: &str ) -> Result<(), anyhow::Error> {
+        BrowserSingleton::click( selector );
+        BrowserSingleton::tab().send_character( keys );
+        Ok(())
+    }
+
+    pub fn screenshot() -> Vec<u8> {
+        BrowserSingleton::tab().capture_screenshot( CaptureScreenshotFormatOption::Png, None, None, true ).expect( "Cannot Screenshot" )
+    }
+
+}
