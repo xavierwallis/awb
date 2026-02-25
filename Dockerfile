@@ -6,7 +6,7 @@ copy . .
 run cargo build --release
 
 
-from debian:bookworm-slim
+from debian:dixie-slim
 workdir /app
 
 # (optional but common) TLS certs for HTTP clients
