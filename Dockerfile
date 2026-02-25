@@ -18,4 +18,4 @@ env ROCKET_ADDRESS=0.0.0.0
 env ROCKET_PORT=8000
 
 expose 8000
-cmd [ "./target/debug/awb" ]
+cmd [ "awb" ]
