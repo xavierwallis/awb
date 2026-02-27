@@ -59,11 +59,11 @@ pub async fn page_screenshot() -> Result<(ContentType, Vec<u8>), Status> {
 
 #[derive(Deserialize)]
 #[serde(crate = "rocket::serde")]
-struct GotoRequest {
+pub struct GotoRequest {
     url: String,
 }
 
-#[post("/page/goto", format = "application/json", data = "<request>")]
+#[post("/page/goto", data = "<request>")]
 pub async fn page_goto(request: Json<GotoRequest>) -> Json<ApiResponse<String>> {
     match AutonomousWebBrowser::page_goto(&request.url).await {
         Ok(_) => Json(ApiResponse {

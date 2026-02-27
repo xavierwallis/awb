@@ -1,3 +1,5 @@
+use crate::awb::AutonomousWebBrowser;
+
 #[macro_use]
 extern crate rocket;
 
@@ -7,6 +9,7 @@ mod awb;
 
 #[launch]
 fn rocket() -> _ {
+    let _  = AutonomousWebBrowser::browser();
     rocket::build().mount(
         "/",
         routes![

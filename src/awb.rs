@@ -1,4 +1,4 @@
-use eoka::{Browser, Page, Result };
+use eoka::{Browser, Page, Result, StealthConfig };
 use tokio::sync::OnceCell;
 
 pub struct AutonomousWebBrowser {
@@ -22,7 +22,11 @@ impl AutonomousWebBrowser {
     }
 
     pub async fn new() -> Result<AutonomousWebBrowser> {
-        let browser = Browser::launch().await?;
+        let config = StealthConfig {
+            headless: false,
+            ..Default::default()
+        };
+        let browser = Browser::launch_with_config( config ).await?;
         let page = browser.new_blank_page().await?;
         Ok(AutonomousWebBrowser { browser, page })
     }
@@ -92,12 +96,12 @@ impl AutonomousWebBrowser {
 
     pub async fn fill(selector: &str, text: &str) -> Result<()> {
         let page: &Page = AutonomousWebBrowser::page().await?;
-        page.fill( selector, text ).await
+        page.human_fill( selector, text ).await
     }
 
     pub async fn input_keys(selector: &str, keys: &str) -> Result<()> {
         let page: &Page = AutonomousWebBrowser::page().await?;
-        page.human_fill( selector, keys ).await 
+        page.human_type( selector, keys ).await 
     }
     
     pub async fn input_key(key: &str) -> Result<()> {
