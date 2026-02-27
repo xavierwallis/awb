@@ -6,8 +6,10 @@ edition = "2024"
 [dependencies]
 rocket = { version = "0.5.1", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
+eoka = "0.3.9"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 
-headless_chrome = { version = "1.0.21", features = ["fetch"] }
+#headless_chrome = { version = "1.0.21", features = ["fetch"] }
 anyhow = "1.0.102"
 base64 = "0.22.1"
 crossbeam-channel = "0.5.15"

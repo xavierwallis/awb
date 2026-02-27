@@ -1,87 +1,65 @@
-use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
-use headless_chrome::{Browser, LaunchOptionsBuilder, Tab};
-use std::ffi::OsStr;
-use std::path::PathBuf;
-use std::sync::{Arc, OnceLock};
+use eoka::{Browser, Page, Result };
+use tokio::sync::OnceCell;
 
 pub struct BrowserSingleton {
     browser: Browser,
-    tab: Arc<Tab>,
+    page: Page,
 }
 
-pub static SINGLETON: OnceLock<BrowserSingleton> = OnceLock::new();
+pub static BROWSER: OnceCell<BrowserSingleton> = OnceCell::const_new();
 
 impl BrowserSingleton {
-    pub fn browser() -> &'static Browser {
-        &SINGLETON.get_or_init(BrowserSingleton::initialize).browser
+    pub async fn instance() -> Result<&'static BrowserSingleton> {
+        BROWSER.get_or_try_init(|| async { BrowserSingleton::new().await }).await
     }
 
-    pub fn tab() -> &'static Arc<Tab> {
-        &SINGLETON.get_or_init(BrowserSingleton::initialize).tab
+    pub async fn browser() -> Result<&'static Browser> {
+        Ok(&Self::instance().await?.browser)
     }
 
-    pub fn initialize() -> BrowserSingleton {
-        let browser = Browser::new(
-            LaunchOptionsBuilder::default()
-                //.path(Some(PathBuf::from("/usr/bin/chromium")))
-                .headless(true)
-                .window_size(Some((1280, 800)))
-                //.port(Some(9222))
-                //.extensions(vec![OsStr::new("/app/selenium-extensions/Vimium")])
-                .args(vec![
-                    OsStr::new("--no-sandbox"),
-                    OsStr::new("--disable-setuid-sandbox"),
-                    OsStr::new("--disable-dev-shm-usage"),
-                    OsStr::new("--user-data-dir=/tmp/chrome-profile"),
-                ])
-                .sandbox(false)
-                .build()
-                .unwrap(),
-        )
-        .expect("Could Not Start Browser");
-
-        let tab = browser.new_tab().expect("Could Not Open Tab");
-
-        BrowserSingleton { browser, tab }
+    pub async fn page() -> Result<&'static Page> {
+        Ok(&Self::instance().await?.page)
     }
 
-    pub fn get_content() -> Result<String, anyhow::Error> {
-        BrowserSingleton::tab().get_content()
+    pub async fn new() -> Result<BrowserSingleton> {
+        let browser = Browser::launch().await?;
+        let page = browser.new_blank_page().await?;
+        Ok(BrowserSingleton { browser, page })
     }
 
-    pub fn get_element_content(selector: &str) -> Result<String, anyhow::Error> {
-        BrowserSingleton::tab()
-            .find_element(selector)?
-            .get_content()
+    pub async fn get_page_metadata() -> Result<String> {
+        let page: &Page = BrowserSingleton::page().await?;
+        page.title().await
     }
 
-    pub fn goto(url: &str) -> Result<(), anyhow::Error> {
-        BrowserSingleton::tab().navigate_to(url)?;
-        Ok(())
+    pub async fn get_element_content(selector: &str) -> Result<String> {
+        let page: &Page = BrowserSingleton::page().await?;
+        let element: eoka::Element = page.find(selector).await?;
+        element.value().await 
     }
 
-    pub fn click(selector: &str) -> Result<(), anyhow::Error> {
-        BrowserSingleton::tab()
-            .wait_for_element(selector)?
-            .click()?;
-        Ok(())
+    pub async fn goto(url: &str) -> Result<()> {
+        let page: &Page = BrowserSingleton::page().await?;
+        page.goto( url ).await
     }
 
-    pub fn wait_for(selector: &str) -> Result<headless_chrome::Element<'_>, anyhow::Error> {
-        BrowserSingleton::tab().wait_for_element(selector)
+    pub async fn click(selector: &str) -> Result<()> {
+        let page: &Page = BrowserSingleton::page().await?;
+        page.click( selector ).await
     }
 
-    pub fn send_keys(keys: &str) -> Result<(), anyhow::Error> {
-        BrowserSingleton::tab().type_str(keys)?;
-        Ok(())
+    pub async fn wait_for(selector: &str) -> Result<eoka::Element<'_>> {
+        let page: &Page = BrowserSingleton::page().await?;
+        page.wait_for(selector, 3000 ).await
     }
 
-    pub fn screenshot() -> Result<Vec<u8>, anyhow::Error> {
-        BrowserSingleton::tab().capture_screenshot(
-            CaptureScreenshotFormatOption::Png,
-            None,
-            None,
-            true,
-        )
+    pub async fn send_keys(selector: &str, keys: &str) -> Result<()> {
+        let page: &Page = BrowserSingleton::page().await?;
+        page.human_fill( selector, keys ).await 
+    }
+
+    pub async fn screenshot() -> Result<Vec<u8>> {
+        let page: &Page = BrowserSingleton::page().await?;
+        page.screenshot().await
     }
 }
