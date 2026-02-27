@@ -72,7 +72,7 @@ impl BrowserSingleton {
     }
 
     pub fn send_keys(keys: &str) -> Result<(), anyhow::Error> {
-        BrowserSingleton::tab().send_character(keys)?;
+        BrowserSingleton::tab().type_str(keys)?;
         Ok(())
     }
 
