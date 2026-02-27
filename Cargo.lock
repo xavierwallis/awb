@@ -67,7 +67,7 @@ dependencies = [
 
 [[package]]
 name = "awb"
-version = "1.6.8"
+version = "2.0.2"
 dependencies = [
  "anyhow",
  "base64",
