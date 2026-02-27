@@ -1,16 +1,16 @@
 use eoka::{Browser, Page, Result };
 use tokio::sync::OnceCell;
 
-pub struct BrowserSingleton {
+pub struct AutonomousWebBrowser {
     browser: Browser,
     page: Page,
 }
 
-pub static BROWSER: OnceCell<BrowserSingleton> = OnceCell::const_new();
+pub static BROWSER: OnceCell<AutonomousWebBrowser> = OnceCell::const_new();
 
-impl BrowserSingleton {
-    pub async fn instance() -> Result<&'static BrowserSingleton> {
-        BROWSER.get_or_try_init(|| async { BrowserSingleton::new().await }).await
+impl AutonomousWebBrowser {
+    pub async fn instance() -> Result<&'static AutonomousWebBrowser> {
+        BROWSER.get_or_try_init(|| async { AutonomousWebBrowser::new().await }).await
     }
 
     pub async fn browser() -> Result<&'static Browser> {
@@ -21,45 +21,45 @@ impl BrowserSingleton {
         Ok(&Self::instance().await?.page)
     }
 
-    pub async fn new() -> Result<BrowserSingleton> {
+    pub async fn new() -> Result<AutonomousWebBrowser> {
         let browser = Browser::launch().await?;
         let page = browser.new_blank_page().await?;
-        Ok(BrowserSingleton { browser, page })
+        Ok(AutonomousWebBrowser { browser, page })
     }
 
     pub async fn get_page_metadata() -> Result<String> {
-        let page: &Page = BrowserSingleton::page().await?;
+        let page: &Page = AutonomousWebBrowser::page().await?;
         page.title().await
     }
 
     pub async fn get_element_content(selector: &str) -> Result<String> {
-        let page: &Page = BrowserSingleton::page().await?;
+        let page: &Page = AutonomousWebBrowser::page().await?;
         let element: eoka::Element = page.find(selector).await?;
         element.value().await 
     }
 
     pub async fn goto(url: &str) -> Result<()> {
-        let page: &Page = BrowserSingleton::page().await?;
+        let page: &Page = AutonomousWebBrowser::page().await?;
         page.goto( url ).await
     }
 
     pub async fn click(selector: &str) -> Result<()> {
-        let page: &Page = BrowserSingleton::page().await?;
+        let page: &Page = AutonomousWebBrowser::page().await?;
         page.click( selector ).await
     }
 
     pub async fn wait_for(selector: &str) -> Result<eoka::Element<'_>> {
-        let page: &Page = BrowserSingleton::page().await?;
+        let page: &Page = AutonomousWebBrowser::page().await?;
         page.wait_for(selector, 3000 ).await
     }
 
     pub async fn send_keys(selector: &str, keys: &str) -> Result<()> {
-        let page: &Page = BrowserSingleton::page().await?;
+        let page: &Page = AutonomousWebBrowser::page().await?;
         page.human_fill( selector, keys ).await 
     }
 
     pub async fn screenshot() -> Result<Vec<u8>> {
-        let page: &Page = BrowserSingleton::page().await?;
+        let page: &Page = AutonomousWebBrowser::page().await?;
         page.screenshot().await
     }
 }

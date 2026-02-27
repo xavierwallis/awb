@@ -4,11 +4,11 @@ use rocket::http::{ContentType, Status};
 use rocket::serde::{Deserialize, Serialize, json::Json};
 
 pub mod awb;
-use crate::awb::BrowserSingleton;
+use crate::awb::AutonomousWebBrowser;
 
 #[get("/health-check")]
 async fn health_check() -> Status {
-    match BrowserSingleton::get_page_metadata().await {
+    match AutonomousWebBrowser::get_page_metadata().await {
         Ok(_) => Status::Ok,
         Err(_) => Status::ServiceUnavailable,
     }
@@ -42,7 +42,7 @@ struct GotoRequest {
 
 #[post("/goto", format = "application/json", data = "<request>")]
 async fn goto(request: Json<GotoRequest>) -> Json<ApiResponse<String>> {
-    match BrowserSingleton::goto(&request.url).await {
+    match AutonomousWebBrowser::goto(&request.url).await {
         Ok(_) => Json(ApiResponse {
             success: true,
             data: None,
@@ -60,7 +60,7 @@ async fn goto(request: Json<GotoRequest>) -> Json<ApiResponse<String>> {
 
 #[get("/get/content")]
 async fn get_content() -> Json<ApiResponse<String>> {
-    match BrowserSingleton::get_page_metadata().await {
+    match AutonomousWebBrowser::get_page_metadata().await {
         Ok(html) => Json(ApiResponse {
             success: true,
             data: Some(html),
@@ -84,7 +84,7 @@ struct ClickRequest {
 
 #[post("/click", data = "<request>", format = "application/json")]
 async fn click(request: Json<ClickRequest>) -> Json<ApiResponse<String>> {
-    match BrowserSingleton::click(&request.selector).await {
+    match AutonomousWebBrowser::click(&request.selector).await {
         Ok(()) => Json(ApiResponse {
             success: true,
             data: None,
@@ -109,7 +109,7 @@ struct KeysRequest {
 
 #[post("/send/keys", data = "<request>", format = "application/json")]
 async fn send_keys(request: Json<KeysRequest>) -> Json<ApiResponse<String>> {
-    match BrowserSingleton::send_keys(&request.selector, &request.keys).await {
+    match AutonomousWebBrowser::send_keys(&request.selector, &request.keys).await {
         Ok(()) => Json(ApiResponse {
             success: true,
             data: None,
@@ -127,7 +127,7 @@ async fn send_keys(request: Json<KeysRequest>) -> Json<ApiResponse<String>> {
 
 #[get("/screenshot")]
 async fn screenshot() -> Result<(ContentType, Vec<u8>), Status> {
-    BrowserSingleton::screenshot().await
+    AutonomousWebBrowser::screenshot().await
         .map(|bytes| (ContentType::PNG, bytes))
         .map_err(|_| Status::InternalServerError)
 }
@@ -136,7 +136,7 @@ async fn screenshot() -> Result<(ContentType, Vec<u8>), Status> {
 
 #[get("/get/content/<selector>")]
 async fn get_element_content(selector: &str) -> Json<ApiResponse<String>> {
-    match BrowserSingleton::get_element_content(selector).await {
+    match AutonomousWebBrowser::get_element_content(selector).await {
         Ok(content) => Json(ApiResponse {
             success: true,
             data: Some(content),
@@ -154,7 +154,7 @@ async fn get_element_content(selector: &str) -> Json<ApiResponse<String>> {
 
 #[get("/wait/for/<selector>")]
 async fn wait_for_element(selector: &str) -> Json<ApiResponse<String>> {
-    match BrowserSingleton::wait_for(selector).await {
+    match AutonomousWebBrowser::wait_for(selector).await {
         Ok(element) => Json(ApiResponse {
             success: true,
             data: Some(String::from("Present")),
@@ -170,7 +170,6 @@ async fn wait_for_element(selector: &str) -> Json<ApiResponse<String>> {
 
 #[launch]
 fn rocket() -> _ {
-    let _ = BrowserSingleton::browser();
     rocket::build().mount(
         "/",
         routes![
