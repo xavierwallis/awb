@@ -26,8 +26,14 @@ impl BrowserSingleton {
                 //.path(Some(PathBuf::from("/usr/bin/chromium")))
                 .headless(true)
                 .window_size(Some((1280, 800)))
-                .port(Some(9222))
+                //.port(Some(9222))
                 //.extensions(vec![OsStr::new("/app/selenium-extensions/Vimium")])
+                .args(vec![
+                    OsStr::new("--no-sandbox"),
+                    OsStr::new("--disable-setuid-sandbox"),
+                    OsStr::new("--disable-dev-shm-usage"),
+                    OsStr::new("--user-data-dir=/tmp/chrome-profile"),
+                ])
                 .sandbox(false)
                 .build()
                 .unwrap(),
