@@ -67,7 +67,7 @@ dependencies = [
 
 [[package]]
 name = "awb"
-version = "2.0.2"
+version = "2.0.4"
 dependencies = [
  "anyhow",
  "base64",
@@ -275,8 +275,6 @@ dependencies = [
 [[package]]
 name = "eoka"
 version = "0.3.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f39bd967c16f1832147a7b7c36f0f196c2046080a50a6b70467d0a9f8bfe6e4b"
 dependencies = [
  "aho-corasick",
  "base64",

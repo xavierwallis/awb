@@ -1,6 +1,6 @@
 [package]
 name = "awb"
-version = "2.0.2"
+version = "2.0.4"
 edition = "2024"
 
 [dependencies]
@@ -14,3 +14,6 @@ anyhow = "1.0.102"
 base64 = "0.22.1"
 crossbeam-channel = "0.5.15"
 tokio-tungstenite = "0.28"
+
+[patch.crates-io]
+eoka = { path = "vendor/eoka" }
