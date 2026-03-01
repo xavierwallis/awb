@@ -134,7 +134,7 @@ impl Browser {
 
         // Build args
         let mut args = stealth_args(&config);
-        args.push("--user-data-dir=/Users/xavierwallis/projects/rust/awb/chrome/profile".into() );
+        args.push("--user-data-dir=/app/chrome/profile".into() );
         args.push( "--no-sandbox".into() );
 
         // Launch Chrome
