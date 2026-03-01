@@ -28,6 +28,8 @@ run apt-get update && apt-get install -y \
 
 copy --from=builder /app/target/release/awb /usr/local/bin/awb
 
+copy chrome/profile /app/chrome/profile
+
 env ROCKET_ADDRESS=0.0.0.0
 env ROCKET_PORT=8000
 
