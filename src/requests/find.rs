@@ -67,3 +67,35 @@ pub async fn find_all_text(text: &str) -> Json<ApiResponse<String>> {
         }),
     }
 }
+
+#[get("/find/element-text/<selector>")]
+pub async fn element_text(selector: &str) -> Json<ApiResponse<String>> {
+    match AutonomousWebBrowser::element_text(selector).await {
+        Ok(text) => Json(ApiResponse {
+            success: true,
+            data: Some(text),
+            error: None,
+        }),
+        Err(error) => Json(ApiResponse {
+            success: false,
+            data: None,
+            error: Some(error.to_string()),
+        }),
+    }
+}
+
+#[get("/find/exists/<selector>")]
+pub async fn element_exists(selector: &str) -> Json<ApiResponse<String>> {
+    match AutonomousWebBrowser::element_exists(selector).await {
+        Ok(exists) => Json(ApiResponse {
+            success: true,
+            data: Some(exists.to_string()),
+            error: None,
+        }),
+        Err(error) => Json(ApiResponse {
+            success: false,
+            data: None,
+            error: Some(error.to_string()),
+        }),
+    }
+}
