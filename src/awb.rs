@@ -45,7 +45,10 @@ impl AutonomousWebBrowser {
         let mut guard = get_lock().lock().await;
         tracing::warn!("Dropping dead browser instance and restarting Chrome...");
         *guard = None;
-        let awb = Arc::new(AutonomousWebBrowser::new().await?);
+        let awb = Arc::new(AutonomousWebBrowser::new().await.map_err(|e| {
+            tracing::error!("Browser reinit failed: {}", e);
+            e
+        })?);
         *guard = Some(Arc::clone(&awb));
         tracing::info!("Browser restarted successfully");
         Ok(awb)
