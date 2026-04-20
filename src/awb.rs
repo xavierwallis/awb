@@ -4,7 +4,7 @@ use eoka::{Browser, Page, Result, StealthConfig};
 use tokio::sync::Mutex;
 
 pub struct AutonomousWebBrowser {
-    browser: Browser,
+    _browser: Browser,
     page: Page,
 }
 
@@ -26,7 +26,7 @@ impl AutonomousWebBrowser {
         };
         let browser = Browser::launch_with_config(config).await?;
         let page = browser.new_blank_page().await?;
-        Ok(AutonomousWebBrowser { browser, page })
+        Ok(AutonomousWebBrowser { _browser: browser, page })
     }
 
     pub async fn instance() -> Result<Arc<AutonomousWebBrowser>> {
@@ -216,7 +216,11 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on element_exists: {}", err);
                 drop(awb);
-                Ok(Self::reset_and_reinit().await?.page.find(selector).await.is_ok())
+                match Self::reset_and_reinit().await?.page.find(selector).await {
+                    Ok(_) => Ok(true),
+                    Err(eoka::Error::ElementNotFound(_)) => Ok(false),
+                    Err(err) => Err(err),
+                }
             }
             Err(eoka::Error::ElementNotFound(_)) => Ok(false),
             Err(err) => Err(err),
@@ -305,6 +309,7 @@ impl AutonomousWebBrowser {
 
     // wait
 
+    #[allow(dead_code)]
     pub async fn wait_for(selector: &str, timeout_ms: u64) -> Result<()> {
         let awb = Self::instance().await?;
         match awb.page.wait_for(selector, timeout_ms).await {
@@ -318,6 +323,7 @@ impl AutonomousWebBrowser {
         }
     }
 
+    #[allow(dead_code)]
     pub async fn wait_for_hidden(selector: &str, timeout_ms: u64) -> Result<()> {
         let awb = Self::instance().await?;
         match awb.page.wait_for_hidden(selector, timeout_ms).await {
@@ -331,6 +337,7 @@ impl AutonomousWebBrowser {
         }
     }
 
+    #[allow(dead_code)]
     pub async fn wait_for_visible(selector: &str, timeout_ms: u64) -> Result<()> {
         let awb = Self::instance().await?;
         match awb.page.wait_for_visible(selector, timeout_ms).await {
@@ -344,6 +351,7 @@ impl AutonomousWebBrowser {
         }
     }
 
+    #[allow(dead_code)]
     pub async fn wait_for_text(text: &str, timeout_ms: u64) -> Result<()> {
         let awb = Self::instance().await?;
         match awb.page.wait_for_text(text, timeout_ms).await {
@@ -357,6 +365,7 @@ impl AutonomousWebBrowser {
         }
     }
 
+    #[allow(dead_code)]
     pub async fn wait_for_url_contains(pattern: &str, timeout_ms: u64) -> Result<()> {
         let awb = Self::instance().await?;
         match awb.page.wait_for_url_contains(pattern, timeout_ms).await {
@@ -370,6 +379,7 @@ impl AutonomousWebBrowser {
         }
     }
 
+    #[allow(dead_code)]
     pub async fn wait_for_url_change(timeout_ms: u64) -> Result<String> {
         let awb = Self::instance().await?;
         match awb.page.wait_for_url_change(timeout_ms).await {

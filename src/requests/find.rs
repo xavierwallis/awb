@@ -22,7 +22,7 @@ pub async fn find(selector: &str) -> Json<ApiResponse<String>> {
 #[get("/find/all/<selector>")]
 pub async fn find_all(selector: &str) -> Json<ApiResponse<String>> {
     match AutonomousWebBrowser::find_all(selector).await {
-        Ok(content) => Json(ApiResponse {
+        Ok(_content) => Json(ApiResponse {
             success: true,
             data: Some( String::from( "WIP" )),
             error: None,
@@ -55,7 +55,7 @@ pub async fn find_text(text: &str) -> Json<ApiResponse<String>> {
 #[get("/find/all/text/<text>")]
 pub async fn find_all_text(text: &str) -> Json<ApiResponse<String>> {
     match AutonomousWebBrowser::find_all_text(text).await {
-        Ok(content) => Json(ApiResponse {
+        Ok(_content) => Json(ApiResponse {
             success: true,
             data: Some( String::from("WIP") ),
             error: None,
