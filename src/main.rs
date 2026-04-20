@@ -6,12 +6,12 @@ mod requests;
 
 #[launch]
 fn rocket() -> _ {
-    tracing_subscriber::fmt()
+    let _ = tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
                 .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")),
         )
-        .init();
+        .try_init();
 
     rocket::build().mount(
         "/",
