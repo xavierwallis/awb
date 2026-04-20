@@ -40,7 +40,7 @@ pub async fn find_text(text: &str) -> Json<ApiResponse<String>> {
     match AutonomousWebBrowser::find_text(text).await {
         Ok(content) => Json(ApiResponse {
             success: true,
-            data: Some( content.text().await.unwrap() ),
+            data: Some(content),
             error: None,
         }),
         Err(error) => Json(ApiResponse {
