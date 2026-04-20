@@ -21,12 +21,15 @@ fn is_fatal(err: &eoka::Error) -> bool {
 impl AutonomousWebBrowser {
     pub async fn new() -> Result<AutonomousWebBrowser> {
         let config = StealthConfig {
-            headless: false,
+            headless: true,
             ..Default::default()
         };
         let browser = Browser::launch_with_config(config).await?;
         let page = browser.new_blank_page().await?;
-        Ok(AutonomousWebBrowser { _browser: browser, page })
+        Ok(AutonomousWebBrowser {
+            _browser: browser,
+            page,
+        })
     }
 
     pub async fn instance() -> Result<Arc<AutonomousWebBrowser>> {
@@ -130,7 +133,13 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on find: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.find(selector).await?.value().await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .find(selector)
+                    .await?
+                    .value()
+                    .await
             }
             Err(err) => Err(err),
         }
@@ -168,7 +177,13 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on find_text: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.find_by_text(text).await?.text().await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .find_by_text(text)
+                    .await?
+                    .text()
+                    .await
             }
             Err(err) => Err(err),
         }
@@ -206,7 +221,13 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on element_text: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.find(selector).await?.text().await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .find(selector)
+                    .await?
+                    .text()
+                    .await
             }
             Err(err) => Err(err),
         }
@@ -239,7 +260,11 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on click: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.human_click(selector).await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .human_click(selector)
+                    .await
             }
             Err(err) => Err(err),
         }
@@ -252,7 +277,11 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on click_text: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.human_click_by_text(text).await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .human_click_by_text(text)
+                    .await
             }
             Err(err) => Err(err),
         }
@@ -265,7 +294,11 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on fill: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.human_fill(selector, text).await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .human_fill(selector, text)
+                    .await
             }
             Err(err) => Err(err),
         }
@@ -278,7 +311,11 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on input_keys: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.human_type(selector, keys).await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .human_type(selector, keys)
+                    .await
             }
             Err(err) => Err(err),
         }
@@ -320,7 +357,12 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on wait_for: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.wait_for(selector, timeout_ms).await.map(|_| ())
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .wait_for(selector, timeout_ms)
+                    .await
+                    .map(|_| ())
             }
             Err(err) => Err(err),
         }
@@ -334,7 +376,11 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on wait_for_hidden: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.wait_for_hidden(selector, timeout_ms).await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .wait_for_hidden(selector, timeout_ms)
+                    .await
             }
             Err(err) => Err(err),
         }
@@ -348,7 +394,12 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on wait_for_visible: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.wait_for_visible(selector, timeout_ms).await.map(|_| ())
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .wait_for_visible(selector, timeout_ms)
+                    .await
+                    .map(|_| ())
             }
             Err(err) => Err(err),
         }
@@ -362,7 +413,12 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on wait_for_text: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.wait_for_text(text, timeout_ms).await.map(|_| ())
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .wait_for_text(text, timeout_ms)
+                    .await
+                    .map(|_| ())
             }
             Err(err) => Err(err),
         }
@@ -376,7 +432,11 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on wait_for_url_contains: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.wait_for_url_contains(pattern, timeout_ms).await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .wait_for_url_contains(pattern, timeout_ms)
+                    .await
             }
             Err(err) => Err(err),
         }
@@ -390,7 +450,11 @@ impl AutonomousWebBrowser {
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on wait_for_url_change: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.wait_for_url_change(timeout_ms).await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .wait_for_url_change(timeout_ms)
+                    .await
             }
             Err(err) => Err(err),
         }
@@ -398,12 +462,20 @@ impl AutonomousWebBrowser {
 
     pub async fn wait_for_network_idle(idle_time_ms: u64, timeout_ms: u64) -> Result<()> {
         let awb = Self::instance().await?;
-        match awb.page.wait_for_network_idle(idle_time_ms, timeout_ms).await {
+        match awb
+            .page
+            .wait_for_network_idle(idle_time_ms, timeout_ms)
+            .await
+        {
             Ok(v) => Ok(v),
             Err(err) if is_fatal(&err) => {
                 tracing::warn!("Fatal browser error on wait_for_network_idle: {}", err);
                 drop(awb);
-                Self::reset_and_reinit().await?.page.wait_for_network_idle(idle_time_ms, timeout_ms).await
+                Self::reset_and_reinit()
+                    .await?
+                    .page
+                    .wait_for_network_idle(idle_time_ms, timeout_ms)
+                    .await
             }
             Err(err) => Err(err),
         }
