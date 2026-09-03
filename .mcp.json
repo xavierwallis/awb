@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "awb": {
+      "command": "python3",
+      "args": [ "/Users/xavierwallis/projects/rust/awb/mcp-server.py" ]
+    }
+  }
+}

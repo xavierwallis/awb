@@ -1,3 +1,4 @@
 /target
 /chrome/profile
 docs/
+__pycache__/

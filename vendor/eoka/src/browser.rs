@@ -134,8 +134,9 @@ impl Browser {
 
         // Build args
         let mut args = stealth_args(&config);
-        args.push("--user-data-dir=/app/chrome/profile".into() );
-        args.push( "--no-sandbox".into() );
+        if let Some(ref dir) = config.user_data_dir {
+            args.push( format!( "--user-data-dir={}", dir ) );
+        }
 
         // Launch Chrome
         tracing::info!("Launching Chrome from {:?}", chrome_path);

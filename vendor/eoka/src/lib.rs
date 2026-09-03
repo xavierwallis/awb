@@ -128,6 +128,8 @@ pub struct StealthConfig {
     /// IANA timezone (default: random from common US/EU timezones).
     /// Set to a specific value like "America/New_York" to control the timezone.
     pub timezone: Option<String>,
+    /// Chrome user data directory for profile persistence (None = Chrome default temp dir)
+    pub user_data_dir: Option<String>,
 }
 
 impl Default for StealthConfig {
@@ -151,6 +153,7 @@ impl Default for StealthConfig {
             proxy_password: None,
             cdp_timeout: 30,
             timezone: None, // Random from common timezones
+            user_data_dir: None,
         }
     }
 }
@@ -177,6 +180,7 @@ impl StealthConfig {
             proxy_password: None,
             cdp_timeout: 30,
             timezone: None,
+            user_data_dir: None,
         }
     }
 

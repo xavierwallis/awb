@@ -1,0 +1,6 @@
+.git
+target
+chrome/profile
+.DS_Store
+.mcp.json
+upload.fish

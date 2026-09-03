@@ -20,8 +20,12 @@ fn is_fatal(err: &eoka::Error) -> bool {
 
 impl AutonomousWebBrowser {
     pub async fn new() -> Result<AutonomousWebBrowser> {
+        let user_data_dir = std::env::var( "CHROME_PROFILE_DIR" )
+            .unwrap_or_else( |_| "./chrome/profile".to_string() );
         let config = StealthConfig {
             headless: true,
+            patch_binary: false,
+            user_data_dir: Some( user_data_dir ),
             ..Default::default()
         };
         let browser = Browser::launch_with_config(config).await?;
